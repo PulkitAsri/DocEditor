@@ -1,9 +1,9 @@
-export const getFilteredSectionData = ({ sections, filter }) => {
+export const getFilteredSectionData = ({ sectionsMap, filter }) => {
   let x = {};
 
-  Object.keys(sections).forEach((key) => {
-    if (filter[key] == true) {
-      x[key] = sections[key].value;
+  Object.keys(sectionsMap).forEach((key) => {
+    if (filter[key] === true) {
+      x[key] = sectionsMap[key];
     } else {
       x[key] = "";
     }

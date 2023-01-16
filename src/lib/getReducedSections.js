@@ -1,7 +1,7 @@
-export const getReducedSections = ({ sections }) => {
+export const getReducedSections = ({ sectionsDefaultMap }) => {
   let x = {};
 
-  Object.keys(sections).forEach((sectionKey) => {
+  Object.keys(sectionsDefaultMap).forEach((sectionKey) => {
     x[sectionKey] = false;
   });
 
