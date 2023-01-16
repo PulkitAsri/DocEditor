@@ -1,0 +1,8 @@
+.mce-content-body .mce-mergetag:hover {
+  background-color: rgba(231, 0, 0, 1);
+}
+
+.mce-content-body .mce-mergetag-affix {
+  background-color: rgba(251, 255, 0, 0.6);
+  color: #08e700;
+}
