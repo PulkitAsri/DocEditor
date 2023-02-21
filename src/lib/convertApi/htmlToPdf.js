@@ -1,7 +1,6 @@
 const { Readable } = require("stream-browserify");
 const { v4: uuidv4 } = require("uuid");
 const htmlToPdf = async ({ body, convertApi, header, footer }) => {
-  console.log("hehehehe", body);
   const htmlStream = Readable.from([body]);
   const tempFileName = `${uuidv4()}.html`;
   const uploadResult = convertApi.upload(htmlStream, tempFileName);

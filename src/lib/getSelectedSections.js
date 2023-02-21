@@ -1,4 +1,4 @@
-export const getFilteredSectionData = ({ sectionsMap, filter }) => {
+export const getSelectedSections = ({ sectionsMap, filter }) => {
   let x = {};
 
   Object.keys(sectionsMap).forEach((key) => {

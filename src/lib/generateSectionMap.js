@@ -13,7 +13,7 @@ export const generateSectionMap = (htmlStr) => {
     }
   }
 
-  console.log("hehehehe sections", sectionDivs);
+  // console.log("hehehehe sections", sectionDivs);
 
   return sectionDivs;
 };

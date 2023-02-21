@@ -1,20 +1,22 @@
+import _ from "lodash";
+import "./App.css";
+import DOMPurify from "dompurify";
+
 import React, { useRef, useState, useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react";
-
 import Mustache from "mustache";
-import "./App.css";
+
 import { sectionTemplate, sectionsDefaultMap } from "./constants";
-import DOMPurify from "dompurify";
+
 import { flattenObject } from "./lib/flattenObject";
-import _ from "lodash";
 import { getReducedSections } from "./lib/getReducedSections";
-import { getFilteredSectionData } from "./lib/getFilteredSectionData";
+import { getSelectedSections } from "./lib/getSelectedSections";
 import { generateSectionMap } from "./lib/generateSectionMap";
 
 //PARAMS - if we wanted to make a component out of this
 /*
-@sectionTemplate - the ordering of the sectionsMap
-@sectionsMap- the map that maintains sectionwise html with vairables used in that
+  @sectionTemplate - the ordering of the sectionsMap
+  @sectionsMap- the map that maintains sectionwise html with vairables used in that
 */
 
 //could be generated from sectionsMap
@@ -39,6 +41,13 @@ export default function App() {
   const [showPreview, setShowPreview] = useState(false);
 
   //variables
+  /*
+    @variableData - input field's data int the form
+    @highlightedData- @variableData inside a span tag (to highlight)
+
+    @sectionCheckboxData- checkbox selection of section
+    @sectionsMap- the state for keeping updations in the section-wise (section to html ) mapping
+  */
   const [variableData, setVariableData] = useState(variableDefaultData);
   const [highlightedData, setHighlightedData] = useState(
     defaultHighlightedData
@@ -49,19 +58,18 @@ export default function App() {
   const [sectionsMap, setSectionsMap] = useState(sectionsDefaultMap);
 
   const generateTemplate = ({ sectionTemplate }) => {
-    console.log("hehehehe reseting template");
-    const filteredSectionData = getFilteredSectionData({
+    const selectedSections = getSelectedSections({
       sectionsMap,
       filter: sectionCheckboxData,
     });
 
-    const rendered = Mustache.render(sectionTemplate, filteredSectionData);
+    const rendered = Mustache.render(sectionTemplate, selectedSections);
     // console.log(rendered);
     return rendered;
   };
 
   // templates
-  const [template, setTemplate] = useState(
+  const [editorTemplate, setEditorTemplate] = useState(
     generateTemplate({ sectionTemplate })
   );
   const [preview, setPreview] = useState(`{{defaultPreview}}`);
@@ -69,9 +77,7 @@ export default function App() {
   const putVarsIntoPreview = () => {
     if (editorRef.current) {
       var content = editorRef.current.getContent();
-      // console.log(content);
       const rendered = Mustache.render(content, highlightedData);
-      // console.log("hehehehe", `<div style="padding:2rem">${rendered}</div>`);
       // editorRef.current.setContent(rendered);
       setPreview(`<div style="padding:2rem">${rendered}</div>`);
     }
@@ -80,15 +86,15 @@ export default function App() {
   //onMount
   useEffect(() => {}, []);
   useEffect(() => {
-    editorRef.current?.setContent(template);
+    editorRef.current?.setContent(editorTemplate);
     putVarsIntoPreview();
-  }, [template]);
+  }, [editorTemplate]);
 
   // if input fields changes
   useEffect(() => {
     Object.keys(flattenObject(variableData)).forEach((key) => {
       let value = variableData[key];
-      // empty=> reset default data with {{variable}}
+      // field empty=> reset to showing {{variable}}
       if (value === "") {
         setVariableData((prev) => {
           return {
@@ -111,17 +117,19 @@ export default function App() {
     putVarsIntoPreview();
   }, [highlightedData]);
 
+  // checkboxes =>
   useEffect(() => {
-    console.log(sectionCheckboxData);
     putVarsIntoPreview();
     const newSectionsMap = generateSectionMap(
       editorRef.current?.getContent() || ""
     );
+
+    //overwrite
     setSectionsMap({ ...sectionsMap, ...newSectionsMap });
   }, [sectionCheckboxData]);
 
   useEffect(() => {
-    setTemplate(generateTemplate({ sectionTemplate }));
+    setEditorTemplate(generateTemplate({ sectionTemplate }));
   }, [sectionsMap]);
 
   return (
@@ -144,7 +152,7 @@ export default function App() {
             // className="tinyEditor"
             apiKey="to9fhhp8oeub3i91ewmtwbk8kmxw8f58c2am0ehging2b6ek"
             onInit={(evt, editor) => (editorRef.current = editor)}
-            // initialValue={template}
+            // initialValue={editorTemplate}
             init={{
               // menubar: false,
               // resize: false,
@@ -164,7 +172,7 @@ export default function App() {
               // content_style: "* { margin: 1rem auto; } ",
               setup: function (editor) {
                 editor.on("Paste Change input Undo Redo", function () {
-                  // setTemplate(editor.getContent());
+                  // setEditorTemplate(editor.getContent());
                   putVarsIntoPreview();
                   // console.log("hehehehe", editor.getContent());
                 });
